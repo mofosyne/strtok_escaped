@@ -3,9 +3,11 @@
 
 #include "strtok_escaped.h"
 
-int main() {
+int main()
+{
     // Define test cases
-    typedef struct {
+    typedef struct
+    {
         char *input;
         char *expected_tokens[10]; // Maximum of 10 tokens per test case
     } Test;
@@ -27,9 +29,10 @@ int main() {
     int num_tests = sizeof(tests) / sizeof(tests[0]);
     int failed_tests = 0;
 
-    // Iterate through each test case
-    for (int i = 0; i < num_tests; i++) {
-        printf("\nTest Case %d: '%s'\n", i, tests[i].input);
+    // Iterate through each test case (Non-Reentrant)
+    for (int i = 0; i < num_tests; i++)
+    {
+        printf("\nstrtok_escaped() Test Case %d: '%s'\n", i, tests[i].input);
         int failed_sub_tests = 0;
 
         // Copy input string to a buffer for tokenization
@@ -39,12 +42,15 @@ int main() {
         // Tokenize the string and compare tokens with expected tokens
         int token_index = 0;
         char *token = strtok_escaped(str, delim);
-        while (token != NULL && tests[i].expected_tokens[token_index] != NULL) {
-
-            if (strcmp(token, tests[i].expected_tokens[token_index]) != 0) {
+        while (token != NULL && tests[i].expected_tokens[token_index] != NULL)
+        {
+            if (strcmp(token, tests[i].expected_tokens[token_index]) != 0)
+            {
                 printf("Token Mismatch - got '%s' but expecting '%s' - failed\n", token, tests[i].expected_tokens[token_index]);
                 failed_sub_tests++;
-            } else {
+            }
+            else
+            {
                 printf("Token: '%s' - ok\n", token);
             }
 
@@ -52,24 +58,80 @@ int main() {
             token = strtok_escaped(NULL, delim);
         }
 
-        if (tests[i].expected_tokens[token_index] != NULL) {
-            printf("Incorrect number of tokens\n");
+        if (tests[i].expected_tokens[token_index] != NULL)
+        {
+            printf("Incorrect number of tokens. Got %d tokens\n", token_index);
             failed_sub_tests++;
         }
 
-        if (failed_sub_tests) {
+        if (failed_sub_tests)
+        {
             failed_tests++;
             printf("FAILED\n");
-
-        }else {
+        }
+        else
+        {
             printf("PASSED\n");
         }
     }
 
-    if (failed_tests > 0) {
+    // Iterate through each test case (Reentrant)
+    for (int i = 0; i < num_tests; i++)
+    {
+        printf("\nstrtok_escaped_r() Test Case %d: '%s'\n", i, tests[i].input);
+        int failed_sub_tests = 0;
+
+        // Copy input string to a buffer for tokenization
+        char str[512];
+        strcpy(str, tests[i].input);
+
+        // Tokenize the string and compare tokens with expected tokens
+        int token_index = 0;
+
+        char *last_token_end = NULL;
+        while (1)
+        {
+            const char *token = strtok_escaped_r(&last_token_end, str, delim);
+            if (token == NULL)
+            {
+                break;
+            }
+            if (strcmp(token, tests[i].expected_tokens[token_index]) != 0)
+            {
+                printf("Token Mismatch - got '%s' but expecting '%s' - failed\n", token, tests[i].expected_tokens[token_index]);
+                failed_sub_tests++;
+            }
+            else
+            {
+                printf("Token: '%s' - ok\n", token);
+            }
+            token_index++;
+        }
+
+        if (tests[i].expected_tokens[token_index] != NULL)
+        {
+            printf("Incorrect number of tokens. Got %d tokens\n", token_index);
+            failed_sub_tests++;
+        }
+
+        if (failed_sub_tests)
+        {
+            failed_tests++;
+            printf("FAILED\n");
+        }
+        else
+        {
+            printf("PASSED\n");
+        }
+    }
+
+    if (failed_tests > 0)
+    {
         printf("\n%d test(s) failed.\n", failed_tests);
         return 1;
-    } else {
+    }
+    else
+    {
         printf("\nAll tests passed.\n");
         return 0;
     }
