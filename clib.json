@@ -1,4 +1,9 @@
 {
   "name": "strtok_escaped",
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "repo": "mofosyne/strtok_escaped.c",
+  "description": " Tokenise a string from a single char deliminator. This is an alternative to strtok but with escaped character support for deliminating a string with a single char (e.g. csv or psv) ",
+  "keywords": ["no heap", "malloc free", "no malloc", "strtok"],
+  "license": "GNUv3",
+  "src": ["strtok_escaped.c", "strtok_escaped.h"]
 }
